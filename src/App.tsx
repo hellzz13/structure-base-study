@@ -1,27 +1,42 @@
-// import SignupForm from './components/Form';
-import { useState } from 'react';
+import { lightTheme, darkTheme } from './application/themes/theme';
+import { LanguageProvider, useLanguage } from './application/contexts/LanguageContext';
 import { ThemeProvider } from 'styled-components';
-import { lightTheme, darkTheme } from './styles/theme';
-import GlobalStyles from './styles/globalStyles';
-import { Button } from './components/Button';
-import { TitleText } from './components/TitleText';
+import { TitleText } from './application/components/TitleText';
+import { Container } from './application/components/Container';
+import { useState } from 'react';
+import { Button } from './application/components/Button';
+
+import GlobalStyles from './application/themes/globalStyles';
+
+import { useTranslation } from 'react-i18next';
 
 export default function App() {
-  const [isDarkThemeState, setIsDarkThemeState] = useState(false);
-  const themeState = isDarkThemeState ? 'escuro' : 'claro';
+  const [theme, setTheme] = useState('escuro');
+  const appTitle = theme === 'escuro' ? 'Dark Theme' : 'Light Theme';
+  const appTheme = theme === 'escuro' ? darkTheme : lightTheme;
+
+  const { t } = useTranslation();
+
+  const { language } = useLanguage();
+
+  function handleChangeTheme(theme: string) {
+    if (theme === 'escuro') return setTheme('claro');
+    return setTheme('escuro');
+  }
+
+  console.log(language);
 
   return (
-    <ThemeProvider theme={isDarkThemeState ? darkTheme : lightTheme}>
-      {/* <div>
-        <h1>Teste validação!</h1>
-        <SignupForm />
-      </div> */}
-      <div className="container">
-        <GlobalStyles />
-        <TitleText>{isDarkThemeState ? 'Dark Theme' : 'Light Theme'}</TitleText>
-        <p>Esta aplicação é um projeto teste que está em modo {themeState}.</p>
-        <Button onClick={() => setIsDarkThemeState(prevTheme => !prevTheme)}>Trocar Tema</Button>
-      </div>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider theme={appTheme}>
+        <Container>
+          <span>{t('general.home')}</span>
+          <GlobalStyles />
+          <TitleText>{appTitle}</TitleText>
+          <p>Esta aplicação é um projeto teste que está em modo {theme}.</p>
+          <Button onClick={() => handleChangeTheme(theme)}>Trocar Tema</Button>
+        </Container>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
